@@ -2,8 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const User = require("./userModal");
+const Data = require('./data.js');
 require("dotenv").config();
-import Data from "./data";
+
 
 
 const requireAuth = async (req, res, next) => {
