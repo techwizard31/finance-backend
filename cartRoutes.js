@@ -162,9 +162,9 @@ const sellitems = async (req, res) => {
 };
 
 function getPrice(name) {
-  const commodity = Data.find((item) => item.Commodityname === name);
-  return commodity ? commodity.prices : null;
-}
+    const commodity = Data.find((item) => item.Commodityname === name);
+    return commodity ? commodity.prices[10] : null;
+  }
 
 const result = async (req, res) => {
   try {
