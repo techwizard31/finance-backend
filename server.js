@@ -50,5 +50,8 @@ const loginuser = async (req, res) => {
     }
 };
 
+app.get('/',(req,res)=>{
+  res.status(200).json({ database:'connecting' })
+})
 app.post('/login',loginuser)
 app.use('/cart',cartRoutes)

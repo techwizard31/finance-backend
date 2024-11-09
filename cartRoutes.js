@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const User = require("./userModal");
 require("dotenv").config();
+import Data from "./data";
+
 
 const requireAuth = async (req, res, next) => {
   const { authorization } = req.headers;
@@ -23,7 +25,7 @@ const requireAuth = async (req, res, next) => {
 };
 
 const buyitems = async (req, res) => {
-  const { user, item, number, price,round } = req.body;
+  const { user, item, number, price, round } = req.body;
   if (!mongoose.Types.ObjectId.isValid(user._id)) {
     return res.status(404).json({ error: "user does not exist !!!" });
   }
@@ -44,7 +46,7 @@ const buyitems = async (req, res) => {
   try {
     const newUser = await User.findByIdAndUpdate(
       { _id: id },
-      { amount: amount, cart: user.cart , round:round},
+      { amount: amount, cart: user.cart, round: round },
       { new: true }
     );
     res.status(200).json(newUser);
@@ -54,24 +56,69 @@ const buyitems = async (req, res) => {
 };
 
 const sellitems = async (req, res) => {
-  const { user, item, number, price,round } = req.body;
+  const { user, item, number, price, round } = req.body;
   if (!mongoose.Types.ObjectId.isValid(user._id)) {
     return res.status(404).json({ error: "user does not exist !!!" });
   }
   const id = user._id;
   const existing = await User.findById(id);
-  existing.amount = existing.amount + number*price;
+  existing.amount = existing.amount + number * price;
   existing.round = round;
   existing.cart.forEach((stuff) => {
     if (stuff.item === item) {
       stuff.number = stuff.number - number;
     }
   });
-  existing.cart.filter((stuff) => stuff.number > 0)
-  
+  existing.cart.filter((stuff) => stuff.number > 0);
+
   try {
     const updatedUser = await existing.save();
     res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(400).json(error.message);
+  }
+};
+
+function getPrice(name) {
+  const commodity = Data.find((item) => item.Commodityname === name);
+  return commodity ? commodity.prices[10] : null; // Returns null if the commodity is not found
+}
+
+const result = async (req, res) => {
+  try {
+    const alldata = await User.find();
+    const result = alldata
+      .map((user) => ({
+        name: user.name,
+        finalamount: user.finalamount,
+      }))
+      .sort((a, b) => b.finalamount - a.finalamount);
+
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(400).json(error.message);
+  }
+};
+
+const myresult = async (req, res) => {
+  const { user } = req.body;
+  if (!mongoose.Types.ObjectId.isValid(user._id)) {
+    return res.status(404).json({ error: "user does not exist !!!" });
+  }
+  try {
+    let total = user.amount;
+    const id = user._id;
+
+    user.cart.forEach((each) => {
+      total += getPrice(each.item) * each.number;
+    });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { finalamount: total },
+      { new: true }
+    );
+    res.status(200).json(updatedUser)
   } catch (error) {
     res.status(400).json(error.message);
   }
@@ -81,6 +128,8 @@ const router = express.Router();
 
 router.use(requireAuth);
 
+router.get("/result", result);
+router.post("/myresult", myresult);
 router.patch("/buy", buyitems);
 router.patch("/sell", sellitems);
 
