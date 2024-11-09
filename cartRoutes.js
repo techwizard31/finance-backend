@@ -127,7 +127,7 @@ const myresult = async (req, res) => {
 
 const router = express.Router();
 
-router.use(requireAuth);
+// router.use(requireAuth);
 
 router.get("/result", result);
 router.post("/myresult", myresult);
