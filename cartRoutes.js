@@ -81,12 +81,12 @@ const sellitems = async (req, res) => {
 };
 
 function getPrice(name) {
-  Data.forEach((item) => {
+  for (let item of Data) {
     if (item.Commodityname === name) {
       commodity = item;
-      return;
+      break;
     }
-  });
+  }
   return commodity ? commodity.prices[10] : null; // Returns null if the commodity is not found
 }
 
