@@ -81,7 +81,12 @@ const sellitems = async (req, res) => {
 };
 
 function getPrice(name) {
-  const commodity = Data.find((item) => item.Commodityname === name);
+  Data.forEach((item) => {
+    if (item.Commodityname === name) {
+      commodity = item;
+      return;
+    }
+  });
   return commodity ? commodity.prices[10] : null; // Returns null if the commodity is not found
 }
 
