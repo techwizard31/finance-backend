@@ -25,6 +25,7 @@ const userSchema = new Schema({
       {
         item: String,
         number: Number,
+        round: Number
       },
     ],
     default: [],
@@ -34,6 +35,10 @@ const userSchema = new Schema({
     type: Number,
     default: 1,
   },
+  chance:{
+    type: Number,
+    default:1
+  }
 });
 
 module.exports= mongoose.model('User', userSchema)

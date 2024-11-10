@@ -118,11 +118,12 @@ const buyitems = async (req, res) => {
   user.cart.forEach((stuff) => {
     if (stuff.item === item) {
       stuff.number = stuff.number + number;
+      stuff.round = round
       a++;
     }
   });
   if (a == 1) {
-    const newitem = { item: item, number: number };
+    const newitem = { item: item, number: number,round:round };
     user.cart.push(newitem);
   }
   try {
@@ -149,6 +150,7 @@ const sellitems = async (req, res) => {
   existing.cart.forEach((stuff) => {
     if (stuff.item === item) {
       stuff.number = stuff.number - number;
+      stuff.round = round;
     }
   });
   existing.cart.filter((stuff) => stuff.number > 0);
@@ -205,6 +207,29 @@ const myresult = async (req, res) => {
     res.status(400).json(error.message);
   }
 };
+const quitresult = async (req, res) => {
+  const { user } = req.body;
+  if (!mongoose.Types.ObjectId.isValid(user._id)) {
+    return res.status(404).json({ error: "user does not exist !!!" });
+  }
+  try {
+    let total = user.amount;
+    const id = user._id;
+
+    user.cart.forEach((each) => {
+      total += getPrice(each.item) * each.number;
+    });
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { finalamount: total, chance: 2},
+      { new: true }
+    );
+    res.status(200).json(updatedUser)
+  } catch (error) {
+    res.status(400).json(error.message);
+  }
+};
 
 const router = express.Router();
 
@@ -212,6 +237,7 @@ const router = express.Router();
 
 router.get("/result", result);
 router.post("/myresult", myresult);
+router.post("/quit", quitresult);
 router.patch("/buy", buyitems);
 router.patch("/sell", sellitems);
 
