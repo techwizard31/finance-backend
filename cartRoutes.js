@@ -151,7 +151,7 @@ const sellitems = async (req, res) => {
       stuff.number = stuff.number - number;
     }
   });
-  existing.cart.filter((stuff) => stuff.number >= 0);
+  existing.cart.filter((stuff) => stuff.number > 0);
 
   try {
     const updatedUser = await existing.save();
