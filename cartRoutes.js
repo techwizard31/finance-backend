@@ -219,10 +219,11 @@ const quitresult = async (req, res) => {
     user.cart.forEach((each) => {
       total += getPrice(each.item) * each.number;
     });
+    const newchance = user.chance +1;
 
     const updatedUser = await User.findByIdAndUpdate(
       id,
-      { finalamount: total, chance: 2},
+      { finalamount: total, chance: newchance },
       { new: true }
     );
     res.status(200).json(updatedUser)
