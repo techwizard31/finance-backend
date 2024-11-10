@@ -113,11 +113,11 @@ const buyitems = async (req, res) => {
   }
   const id = user._id;
   var amount = user.amount;
-  amount = amount - number * price;
+  amount = amount - Number(number) * price;
   var a = 1;
   user.cart.forEach((stuff) => {
     if (stuff.item === item) {
-      stuff.number = stuff.number + number;
+      stuff.number = stuff.number + Number(number);
       stuff.round = round
       a++;
     }
@@ -145,11 +145,11 @@ const sellitems = async (req, res) => {
   }
   const id = user._id;
   const existing = await User.findById(id);
-  existing.amount = existing.amount + number * price;
+  existing.amount = existing.amount + Number(number) * price;
   existing.round = round;
   existing.cart.forEach((stuff) => {
     if (stuff.item === item) {
-      stuff.number = stuff.number - number;
+      stuff.number = stuff.number - Number(number);
       stuff.round = round;
     }
   });
